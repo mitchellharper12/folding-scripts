@@ -1,0 +1,4 @@
+#!/bin/sh
+
+exec numactl --membind=1 /var/lib/fahclient/cores/cores.foldingathome.org/v7/lin/64bit/Core_22.fah/FahCore_22.orig $*
+#exec /var/lib/fahclient/cores/cores.foldingathome.org/v7/lin/64bit/Core_22.fah/FahCore_22.orig $*
