@@ -65,6 +65,22 @@ for pid in `pgrep FAHC`; do
 	cset proc -m --threads -p $pid -t root
 done
 
+# sshd so subshells aren't restricted
+for pid in `pgrep sshd`; do
+	cset proc -m --threads -p $pid -t root
+done
+
+# existing bash shells
+for pid in `pgrep bash`; do
+	cset proc -m --threads -p $pid -t root
+done
+
+# existing tmux sessions
+for pid in `pgrep tmux`; do
+	cset proc -m --threads -p $pid -t root
+done
+
+
 GPUSETNAME=cpuFAHGPU
 #GPUCPUSPEC=6-8,12-14
 GPUCPUSPEC=6,12
