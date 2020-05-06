@@ -60,6 +60,11 @@ cset proc -m --threads -f root -t $USERSETNAME
 # init
 cset proc -m -p 1 -t root
 
+# Folding cores and wrappers, so that numactl runs properly
+for pid in `pgrep FAHC`; do
+	cset proc -m --threads -p $pid -t root
+done
+
 GPUSETNAME=cpuFAHGPU
 #GPUCPUSPEC=6-8,12-14
 GPUCPUSPEC=6,12
