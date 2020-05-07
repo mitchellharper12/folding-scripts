@@ -15,9 +15,14 @@ GPUSPEC=11,23
 #GPUSPEC=11
 #OTHERSPEC=12-23
 #OTHERSPEC=0-11
-OTHERSPEC=0-9
+OTHERSPEC=0-8
 #OTHERSPEC=0-10
 #OTHERSPEC=13-23
+
+# Global nicing
+FAHCLIENTUID=123
+renice -n -3 -u $FAHCLIENTUID
+ionice -c 2 -n 2 -u $FAHCLIENTUID
 
 # Wrangle user threads
 USERCPUSPEC=$OTHERSPEC
@@ -57,6 +62,8 @@ for pid in `pgrep FahCore_22`; do
 	cset proc -m -p $pid -t $GPU
 	#taskset -pc $GPUSPEC $pid
 	taskset -pc $GPUCORE $pid
+	renice -n 0 $pid
+	ionice -c 2 -n 0 -p $pid 
 done
 
 # Move important stuff to special group
