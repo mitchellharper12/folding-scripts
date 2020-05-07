@@ -54,15 +54,16 @@ cur_proc=0
 for thread in $worker_threads; do
 	cset proc -m -p $thread -t $CPU
 	taskset -pc ${provision_order[$cur_proc]} $thread 
+	renice -n -15 $thread
 	((cur_proc=cur_proc+1))
 done
 
 GPUCORE=11
 for pid in `pgrep FahCore_22`; do
-	cset proc -m -p $pid -t $GPU
+	cset proc -m --threads -p $pid -t $GPU
 	#taskset -pc $GPUSPEC $pid
 	taskset -pc $GPUCORE $pid
-	renice -n 0 $pid
+	renice -n -19 $pid
 	ionice -c 2 -n 0 -p $pid 
 done
 
