@@ -52,9 +52,11 @@ for thread in $worker_threads; do
 	((cur_proc=cur_proc+1))
 done
 
+GPUCORE=11
 for pid in `pgrep FahCore_22`; do
 	cset proc -m -p $pid -t $GPU
-	taskset -pc $GPUSPEC $pid
+	#taskset -pc $GPUSPEC $pid
+	taskset -pc $GPUCORE $pid
 done
 
 # Move important stuff to special group
