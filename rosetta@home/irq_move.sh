@@ -14,8 +14,8 @@ done
 
 # Kernel threadwerk
 KERNELSETNAME=cpuK
-if [ ! -d "/sys/fs/cgroup/cpuset/${KERNELSETNAME}" ]; then
-	cset set -m 0-1 -s $KERNELSETNAME -c $CPUSPEC
-fi
+#if [ ! -d "/sys/fs/cgroup/cpuset/${KERNELSETNAME}" ]; then
+	cset set -m 0 -s $KERNELSETNAME -c $CPUSPEC
+#fi
 
 cset proc -k -f root -t $KERNELSETNAME
