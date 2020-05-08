@@ -15,9 +15,11 @@ GPUSPEC=11,23
 #GPUSPEC=11
 #OTHERSPEC=12-23
 #OTHERSPEC=0-11
-OTHERSPEC=0-8
+OTHERSPEC=0-2
 #OTHERSPEC=0-10
 #OTHERSPEC=13-23
+#CRITCPUSPEC=$OTHERSPEC
+CRITCPUSPEC=3-8
 
 # Global nicing
 FAHCLIENTUID=123
@@ -27,10 +29,11 @@ ionice -c 2 -n 2 -u $FAHCLIENTUID
 # Wrangle user threads
 USERCPUSPEC=$OTHERSPEC
 USERSETNAME=cpuUser
+# We now do this with the kernel argument isolcpus
 #if [ ! -d "/sys/fs/cgroup/cpuset/${USERSETNAME}" ]; then
-	cset set -m 1 -c $USERCPUSPEC -s $USERSETNAME
+#	cset set -m 0 -c $USERCPUSPEC -s $USERSETNAME
 #fi
-cset proc -m --threads -f root -t $USERSETNAME
+#cset proc -m --threads -f root -t $USERSETNAME
 
 #EXCLUSIVE=1
 EXCLUSIVE=1
@@ -41,8 +44,8 @@ cset set -s $CPU -c $CPUSPEC -m 0-1
 cset set -s $GPU -c $GPUSPEC -m 1
 echo $EXCLUSIVE > /sys/fs/cgroup/cpuset/$CPU/cpuset.cpu_exclusive
 echo $EXCLUSIVE > /sys/fs/cgroup/cpuset/$GPU/cpuset.cpu_exclusive
-# We only will care about threads with at least 90% CPU utilization
-worker_threads="$(ps -Teo pcpu,tid,comm | grep FahCore_a7.orig | grep "^9.\." | awk '{ print $2 }')"
+# We only will care about threads with actual work
+worker_threads="$(ps -Teo pcpu,tid,comm | grep FahCore_a7.orig | grep -v "^ 0.0" | awk '{ print $2 }')"
 #echo $worker_threads
 
 #provision_order=({6..17})
@@ -52,6 +55,7 @@ provision_order=(10 {12..22})
 #provision_order=({0..11})
 cur_proc=0
 for thread in $worker_threads; do
+#for thread in `pgrep _a7`; do
 	cset proc -m -p $thread -t $CPU
 	taskset -pc ${provision_order[$cur_proc]} $thread 
 	renice -n -15 $thread
@@ -68,7 +72,6 @@ for pid in `pgrep FahCore_22`; do
 done
 
 # Move important stuff to special group
-CRITCPUSPEC=$OTHERSPEC
 CRITSETNAME=cpuCrit
 #if [ ! -d "/sys/fs/cgroup/cpuset/${CRITSETNAME}" ]; then
 	cset set -m 0-1 -c $CRITCPUSPEC -s $CRITSETNAME
@@ -88,9 +91,9 @@ CRITSETNAME=cpuCrit
 		cset proc -m --threads -p $pid -t $CRITSETNAME
 	done
 
-	for pid in `pgrep systemd`; do
-		cset proc -m --threads -p $pid -t $CRITSETNAME
-	done
+#	for pid in `pgrep systemd`; do
+#		cset proc -m --threads -p $pid -t $CRITSETNAME
+#	done
 
 	for pid in `pgrep dbus-daemon`; do
 		cset proc -m --threads -p $pid -t $CRITSETNAME
@@ -100,24 +103,24 @@ CRITSETNAME=cpuCrit
 
 # Move important procs back to root
 # init
-cset proc -m -p 1 -t root
+#cset proc -m -p 1 -t root
 
 # Folding cores and wrappers, so that numactl runs properly
-for pid in `pgrep FAHC`; do
-	cset proc -m --threads -p $pid -t root
-done
+#for pid in `pgrep FAHC`; do
+#	cset proc -m --threads -p $pid -t root
+#done
 
 # sshd so subshells aren't restricted
-for pid in `pgrep sshd`; do
-	cset proc -m --threads -p $pid -t root
-done
+#for pid in `pgrep sshd`; do
+#	cset proc -m --threads -p $pid -t root
+#done
 
 # existing bash shells
-for pid in `pgrep bash`; do
-	cset proc -m --threads -p $pid -t root
-done
+#for pid in `pgrep bash`; do
+#	cset proc -m --threads -p $pid -t root
+#done
 
 # existing tmux sessions
-for pid in `pgrep tmux`; do
-	cset proc -m --threads -p $pid -t root
-done
+#for pid in `pgrep tmux`; do
+#	cset proc -m --threads -p $pid -t root
+#done
