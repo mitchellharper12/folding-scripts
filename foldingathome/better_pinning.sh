@@ -9,17 +9,20 @@ GPU=$FAH/cpuFAHGPU
 #CPUSPEC=0-10,12
 #CPUSPEC=12-23
 #CPUSPEC=0-11
-CPUSPEC=10,12-22
+#CPUSPEC=10,12-22
+#CPUSPEC=3-10,12-23
+CPUSPEC=1-10,12-23
 GPUSPEC=11,23
 #GPUSPEC=12
 #GPUSPEC=11
 #OTHERSPEC=12-23
 #OTHERSPEC=0-11
-OTHERSPEC=0-2
+#OTHERSPEC=0-2
+OTHERSPEC=0
 #OTHERSPEC=0-10
 #OTHERSPEC=13-23
 #CRITCPUSPEC=$OTHERSPEC
-CRITCPUSPEC=3-8
+CRITCPUSPEC=$CPUSPEC
 
 # Global nicing
 FAHCLIENTUID=123
@@ -36,7 +39,7 @@ USERSETNAME=cpuUser
 #cset proc -m --threads -f root -t $USERSETNAME
 
 #EXCLUSIVE=1
-EXCLUSIVE=1
+EXCLUSIVE=0
 cset set -s $FAH -c $CPUSPEC,$GPUSPEC -m 0-1
 #cset set -s $FAH -c 0-23 -m 0-1
 echo $EXCLUSIVE > /sys/fs/cgroup/cpuset/$FAH/cpuset.cpu_exclusive
@@ -44,21 +47,28 @@ cset set -s $CPU -c $CPUSPEC -m 0-1
 cset set -s $GPU -c $GPUSPEC -m 1
 echo $EXCLUSIVE > /sys/fs/cgroup/cpuset/$CPU/cpuset.cpu_exclusive
 echo $EXCLUSIVE > /sys/fs/cgroup/cpuset/$GPU/cpuset.cpu_exclusive
+
+# We don't need numa balancing, we do it on our own
+echo 0 > /proc/sys/kernel/numa_balancing
 # We only will care about threads with actual work
 worker_threads="$(ps -Teo pcpu,tid,comm | grep FahCore_a7.orig | grep -v "^ 0.0" | awk '{ print $2 }')"
-#echo $worker_threads
+echo $worker_threads
 
 #provision_order=({6..17})
 #provision_order=({12..23})
 #provision_order=({0..10} 12)
-provision_order=(10 {12..22})
+#provision_order=`echo 10 {12..22}`
+#provision_list=($provision_order $provision_order)
+provision_list=({1..10} {12..22} 3 14 22)
 #provision_order=({0..11})
 cur_proc=0
 for thread in $worker_threads; do
 #for thread in `pgrep _a7`; do
 	cset proc -m -p $thread -t $CPU
-	taskset -pc ${provision_order[$cur_proc]} $thread 
+	taskset -pc ${provision_list[$cur_proc]} $thread 
+	#taskset -pc $CPUSPEC $thread 
 	renice -n -15 $thread
+	chrt -r -p 0 $thread
 	((cur_proc=cur_proc+1))
 done
 
