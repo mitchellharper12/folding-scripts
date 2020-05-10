@@ -10,7 +10,7 @@
 
 // If the below is set to 0, we will always return immediately
 // Otherwise, we will selectively yield based on the modulus of a random int
-#define SELECTIVE_YIELD 1
+#define SELECTIVE_YIELD 0
 
 #if SELECTIVE_YIELD
 
