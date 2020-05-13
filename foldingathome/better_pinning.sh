@@ -57,9 +57,9 @@ echo $worker_threads
 #provision_order=({6..17})
 #provision_order=({12..23})
 #provision_order=({0..10} 12)
-#provision_order=`echo 10 {12..22}`
+provision_list=(10 {12..22})
 #provision_list=($provision_order $provision_order)
-provision_list=({1..10} {12..22} 3 14 22)
+#provision_list=({1..10} {12..22} 3 14 22)
 #provision_order=({0..11})
 cur_proc=0
 for thread in $worker_threads; do

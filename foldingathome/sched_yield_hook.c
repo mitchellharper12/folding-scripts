@@ -42,6 +42,7 @@ static void yield_hook_debug_printf(char* buf, ...) {
 	return;
 }
 
+
 static void yield_hook_init_rand() {
 	orig_sched_yield = dlsym(RTLD_NEXT, "sched_yield");
 # if ENABLE_DYNAMIC_YIELD_DEBUG
@@ -63,13 +64,14 @@ static void yield_hook_init_rand() {
 }
 #endif // SELECTIVE_YIELD
 
+
 int sched_yield() {
 #if SELECTIVE_YIELD
 	if (yield_hook_modulus) {
 		int randval = rand();
-		yield_hook_debug_printf("yield_hook: Modulus: %d\n", randval);
+		yield_hook_debug_printf("Modulus: %d\n", randval);
 		if (randval % yield_hook_modulus == 0) {
-			yield_hook_debug_printf("yield_hook: Calling original yield\n");
+			yield_hook_debug_printf("Calling original yield\n");
 			return orig_sched_yield();
 		}
 	}

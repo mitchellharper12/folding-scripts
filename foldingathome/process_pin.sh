@@ -1,5 +1,7 @@
 #!/bin/bash
 
+exit 0
+
 #cset:
 #         Name       CPUs-X    MEMs-X Tasks Subs Path
 # ------------ ---------- - ------- - ----- ---- ----------
@@ -94,7 +96,7 @@ for pid in $(pgrep FahCore_22); do
 	cset proc -m --threads -p $pid $GPUSETNAME
 	taskset -pc $GPUCORE $pid
 	renice -n 0 $pid
-	ionice -c 1 -n 0 -p $pid 
+	ionice -c 2 -n 0 -p $pid 
 	#chrt -f -p 99 $pid
 done
 
