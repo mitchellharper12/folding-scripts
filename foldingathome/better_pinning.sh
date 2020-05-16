@@ -1,5 +1,9 @@
 #!/bin/bash
 
+
+# currently value of GRUB_CMDLINE_LINUX_DEFAULT in /etc/default/grub
+# GRUB_CMDLINE_LINUX_DEFAULT="maybe-ubiquity isolcpus=1-23 nohz_full=1-23 mitigations=off"
+
 set -v
 
 FAH=/cpuFAH
