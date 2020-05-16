@@ -27,13 +27,13 @@ NUMA node 1, for reasons I will explain later.
 A bash script interposed between the F@H manager and the CPU
 folding core that forces all memory allocations to be bound to
 the node upon which a thread is running. Also sets up the LD\_PRELOAD
-for not calling `sched\_yield`.
+for not calling `sched_yield`.
 
 ### [sched\_yield\_hook.c](./foldingathome/sched_yield_hook.c)
 
 A C file that, when build using the provided Makefile, produces a shared
 object that can be preloaded that always causes the libc wrapper over the
-`sched\_yield` syscall to return 0 before every yielding to the kernel.
+`sched_yield` syscall to return 0 before every yielding to the kernel.
 Also optionally can be built in a configruation that allows for selective
 yielding, but there's no evidence there's any use case where that leads to
 a performance gain.
