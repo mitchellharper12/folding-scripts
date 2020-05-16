@@ -31,7 +31,7 @@ for not calling `sched_yield`.
 
 ### [sched\_yield\_hook.c](./foldingathome/sched_yield_hook.c)
 
-A C file that, when build using the provided Makefile, produces a shared
+A C file that, when built using the provided Makefile, produces a shared
 object that can be preloaded that always causes the libc wrapper over the
 `sched_yield` syscall to return 0 before every yielding to the kernel.
 Also optionally can be built in a configruation that allows for selective
