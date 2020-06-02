@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 # currently value of GRUB_CMDLINE_LINUX_DEFAULT in /etc/default/grub
 # GRUB_CMDLINE_LINUX_DEFAULT="maybe-ubiquity isolcpus=1-23 nohz_full=1-23 mitigations=off"
 
@@ -21,9 +20,9 @@ GPU=$FAH/cpuFAHGPU
 # Core 0: non-important usermode threads
 # Cores 1-10,12-22: important usermode threads
 # Cores 11,23: reserved for GPU folding
-# Cores 10,12-22: reserved for CPU folding threads
+# Cores 8,12-22: reserved for CPU folding threads
 CPUSPEC=1-10,12-22
-GPUSPEC=11,23
+GPUSPEC=9-11,23
 #GPUSPEC=12
 #GPUSPEC=11
 #OTHERSPEC=12-23
@@ -69,7 +68,9 @@ echo $worker_threads
 #provision_order=({12..23})
 #provision_order=({0..10} 12)
 # This is a bash list with the order of how we pin F@H threads (12 total)
-provision_list=(10 {12..22})
+#provision_list=(8 20 {12..19} 21 22)
+provision_list=(8 20 {12..19} 21 22 2 4 7 9)
+#provision_list=(6 18 7 19 8 20 1 13 2 14 3 15 4 16)
 #provision_list=($provision_order $provision_order)
 #provision_list=({1..10} {12..22} 3 14 22)
 #provision_order=({0..11})
@@ -80,7 +81,6 @@ for thread in $worker_threads; do
 	taskset -pc ${provision_list[$cur_proc]} $thread 
 	#taskset -pc $CPUSPEC $thread 
 	renice -n -15 $thread
-	chrt -r -p 0 $thread
 	((cur_proc=cur_proc+1))
 done
 
