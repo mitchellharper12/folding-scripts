@@ -1,13 +1,20 @@
-An assortment of scripts used to wrangle folding
-processes, more documentation forthcoming.
+An assortment of scripts used to wrangle Folding@Home
+processes. See my blog post [Making Every Cycle Count in the Fight Against COVID](https://www.symbolcrash.com/2020/06/01/making-every-cycle-count-in-the-fight-against-covid/) for a deeper introduction and background on this repository. These scripts are provided as reference only, and commented out lines are included in scripts to leave a history of techniques attempted.
 
 ## Important files:
+
+### [dumber\_pinning.sh](./foldingathome/dumber_pinning.sh)
+
+This script is currently runs as a cron job on my dedicated folding box and handles assignment of
+folding threads to CPU cores. It additionally sets compute and IO scheduler hints on managed processes.
+It is slightly less complicated than the script I originally published called `better_pinning.sh`.
 
 ### [better\_pinning.sh](./foldingathome/better_pinning.sh)
 
 A script (currently very tailored to my TR 1920x machine) for
 pinning folding at home cores to specific threads, and moving
-all other threads appropriately.
+all other threads appropriately. This was my first attempt at 
+writing a management script, and it has been obsoleted by `dumber_pinning.sh`.
 
 ### [irq\_move.sh](./rosetta@home/irq_move.sh)
 
@@ -19,7 +26,7 @@ folding threads).
 
 A bash script interposed between the F@H manager and the GPU
 folding core that forces all memory allocations to be bound to
-NUMA node 1, for reasons I will explain later.
+NUMA node 1 (see blog post in introduction).
 
 
 ### [FahCore\_a7](./foldingathome/FahCore_a7)
@@ -41,7 +48,7 @@ a performance gain.
 ### [Makefile](./foldingathome/Makefile)
 
 Builds the shared library described above using GCC settings tuned for
-the Zen microarcheticture.
+the Zen v1 microarcheticture.
 
 ## License:
 
